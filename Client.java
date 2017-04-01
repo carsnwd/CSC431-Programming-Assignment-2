@@ -22,13 +22,13 @@ public class Client
     private Random rand;
 
     //Output to server
-    PrintWriter out;
+    private PrintWriter out;
 
     //Input from server
-    Scanner conIn;
+    private Scanner conIn;
 
     //Input from user
-    Scanner in;
+    private Scanner in;
 
     /**
      * Creates a new instance of the client
@@ -37,7 +37,7 @@ public class Client
      * @throws IOException
      * @throws InterruptedException
      */
-    public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException
+    public static void main(String[] args) throws IOException, InterruptedException
     {
         Client c = new Client();
         c.run();
@@ -50,7 +50,7 @@ public class Client
      * @throws IOException
      * @throws InterruptedException
      */
-    public void run() throws UnknownHostException, IOException, InterruptedException
+    private void run() throws IOException, InterruptedException
     {
         String choice; //To advance client and send next string
         String msg; //Recieve messages from server
@@ -97,7 +97,7 @@ public class Client
      * Select random destination
      * to send to.
      */
-    public String randomDestination()
+    private String randomDestination()
     {
         List<String> destinations = Arrays.asList("A","B","C","D");
         destinations.remove(CLIENT_ID); //Do not send it to itself...
@@ -111,7 +111,7 @@ public class Client
      * @throws UnknownHostException
      * @throws IOException
      */
-    private Socket openConnection() throws UnknownHostException, IOException
+    private Socket openConnection() throws IOException
     {
         System.out.println("Connecting to server...");
         Socket connection = new Socket(HOST, PORT); //Connects to server
