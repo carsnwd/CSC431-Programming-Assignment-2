@@ -8,6 +8,13 @@ import java.util.Hashtable;
  * @author Carson
  */
 public class RoutingTableFactory {
+    /**
+     * Given router ID, it gets the respective
+     * Routing Table as a hashmap.
+     * @param router
+     * @return
+     * @throws InvalidRouterIDException
+     */
     public Hashtable<Character, String> getRoutingTable(int router) throws InvalidRouterIDException
     {
         Hashtable<Character, String> routingTable = new Hashtable<Character, String>();
@@ -46,7 +53,9 @@ public class RoutingTableFactory {
      */
     public class InvalidRouterIDException extends Exception
     {
+        //Routing ID
         private int router;
+
         public InvalidRouterIDException(int router)
         {
             this.router = router;
