@@ -3,6 +3,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * Client side for our client
@@ -17,7 +19,7 @@ public class Client
 
     private static final String HOST = "localhost";
 
-    private static final String CLIENT_ID = "A";
+    private static final byte CLIENT_ID = 'A';
 
     private Random rand;
 
@@ -52,7 +54,6 @@ public class Client
      */
     private void run() throws IOException, InterruptedException
     {
-        String choice; //To advance client and send next string
         String msg; //Recieve messages from server
 
         //Opens connection
@@ -79,30 +80,44 @@ public class Client
      */
     private void generateAndSendPackets(Socket connection) throws InterruptedException, IOException
     {
-        String packet;
-        for (int messageNumber = 0; messageNumber <= 20; messageNumber++)
+        byte packet[] = new byte[3];
+        for (byte messageNumber = 0; messageNumber <= 20; messageNumber++)
         {
-            packet = CLIENT_ID; //SOURCE
-            packet = packet + randomDestination(); //DESTINATION
-            //ADD CHECKSUM TO MESSAGE //CHECKSUM
-            packet = packet + messageNumber; //DATA
-            //ADD OTHER DATA TO MESSAGE? //DATA
-            send(packet);
-            Thread.sleep(4000);
+            packet[0] = CLIENT_ID; //SOURCE
+            packet[1] = randomDestination(); //DESTINATION
+            packet[2] = computeCheckSum(packet); //COMPUTE CHECKSUM
+            packet[3] = messageNumber; //DATA
+            //Need more data?
+            send(packet); //SEND PACKET
+            Thread.sleep(4000); //WAIT TO SEND NEXT PACKET
         }
         closeConnection(connection); //Closes the connection
+    }
+
+
+    /**
+     * Given a packet, it computes the checksum for
+     * the packet with internal Checksum library
+     * @param packet
+     * @return
+     */
+    private byte computeCheckSum(byte[] packet)
+    {
+        Checksum checkSum = new CRC32();
+        checkSum.update(packet, 0, packet.length);
+        return (byte)checkSum.getValue();
     }
 
     /**
      * Select random destination
      * to send to.
      */
-    private String randomDestination()
+    private byte randomDestination()
     {
         List<String> destinations = Arrays.asList("A","B","C","D");
         destinations.remove(CLIENT_ID); //Do not send it to itself...
         rand = new Random();
-        return destinations.get(rand.nextInt(destinations.size()));
+        return Byte.valueOf(destinations.get(rand.nextInt(destinations.size()))); //converts string to byte
     }
 
     /**
@@ -135,7 +150,7 @@ public class Client
      * with the string to reverse.
      * @param packet
      */
-    private void send(String packet)
+    private void send(byte[] packet)
     {
         System.out.println("You sent " + packet + ", sending message...");
         out.println(packet);
