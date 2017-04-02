@@ -85,9 +85,9 @@ public class Client
         {
             packet[0] = CLIENT_ID; //SOURCE
             packet[1] = randomDestination(); //DESTINATION
-            packet[2] = computeCheckSum(packet); //COMPUTE CHECKSUM
             packet[3] = messageNumber; //DATA
             //Need more data?
+            packet[2] = computeCheckSum(packet); //COMPUTE CHECKSUM
             send(packet); //SEND PACKET
             Thread.sleep(4000); //WAIT TO SEND NEXT PACKET
         }
