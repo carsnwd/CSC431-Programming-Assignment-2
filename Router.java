@@ -13,8 +13,15 @@ public class Router {
 
     public ServerSocket server;
 
+    private final int ROUTER_ID = 1;
+
     public Router(){
-        routingTable = new Hashtable<Character, String>();
+        RoutingTableFactory rtf = new RoutingTableFactory();
+        try{
+            routingTable = rtf.getRoutingTable(ROUTER_ID);
+        } catch(RoutingTableFactory.InvalidRouterIDException e){
+            e.printStackTrace();
+        }
         try {
             server = new ServerSocket(9000);
         } catch (IOException e) {
@@ -110,7 +117,6 @@ public class Router {
             }
 
         }
-
 
         @Override
         public void run(){
