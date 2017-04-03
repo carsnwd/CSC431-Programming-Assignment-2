@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -22,6 +23,9 @@ public class Client
     private static final byte CLIENT_ID = 'A';
 
     private Random rand;
+
+    //For reciving packets
+    private ServerSocket clientRecieverSocket = null;
 
     //Output to server
     private PrintWriter out;
@@ -80,7 +84,7 @@ public class Client
      */
     private void generateAndSendPackets(Socket connection) throws InterruptedException, IOException
     {
-        byte packet[] = new byte[3];
+        byte packet[] = new byte[4];
         for (byte messageNumber = 0; messageNumber <= 20; messageNumber++)
         {
             packet[0] = CLIENT_ID; //SOURCE

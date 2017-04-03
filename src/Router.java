@@ -131,4 +131,23 @@ public class Router {
     }
 }
 
+/**********
+ * CODE FIDDLING WITH STRINGS -> BYTES AND VICE VERSA
+ public static void main(String[] args)
+ {
+ byte packet[] = new byte[4];
+ packet[0] = 'D';
+ packet[1] = 'B';
+ packet[3] = 29;
+
+ Checksum checkSum = new CRC32();
+ checkSum.update(packet, 0, packet.length);
+ packet[2] = (byte)checkSum.getValue();
+
+ System.out.println(packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3]);
+ String str = new String(packet);
+ System.out.println(str);
+ }
+ */
+
 
