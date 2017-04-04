@@ -97,6 +97,28 @@ public class Router{
             dis = new DataInputStream(c.getInputStream());
         }
 
+        /**
+         * Given a packet, it computes the checksum for
+         * the packet with internal Checksum library
+         * @param packet
+         * @return
+         */
+        private boolean checkCheckSum(byte[] packet)
+        {
+            byte[] tempPacket = new byte[3];
+            tempPacket[0] = packet[0];
+            tempPacket[1] = packet[1];
+            tempPacket[2] = packet[3];
+            tempPacket[3] = packet[4];
+            Checksum checkSum = new CRC32();
+            checkSum.update(tempPacket, 0, tempPacket.length);
+            if((byte)checkSum.getValue() == packet[2]){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
         public void run()
         {
             out.println("R: Connected to router " + ROUTER_ID + " at " + SERVER.getLocalPort());
@@ -115,21 +137,25 @@ public class Router{
                 System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[5]);
                 //Get routing table, look up what link to send packet to.
                 Hashtable<Byte, String> routingTable = router.getRoutingTable();
-                String destination = routingTable.get(packet[1]);
+                if(checkCheckSum(packet)){
+                    String destination = routingTable.get(packet[1]);
 
-                try {
-					Socket targetRouter = new Socket(destination, 9000);
-					DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
-					dos.write(packet);
-					dos.flush();
-	                System.out.println("Forwarding to " + destination);
-	                targetRouter.close();
-	                dos.close();
-				} catch (UnknownHostException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+                    try {
+                        Socket targetRouter = new Socket(destination, 9000);
+                        DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
+                        dos.write(packet);
+                        dos.flush();
+                        System.out.println("Forwarding to " + destination);
+                        targetRouter.close();
+                        dos.close();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    System.out.println("Checksum invalid!!!!");
+                }
             }
         }
     }
