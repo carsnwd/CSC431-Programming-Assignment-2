@@ -1,9 +1,13 @@
+package runner;
+
 import javax.xml.crypto.Data;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.Scanner;
 
@@ -20,6 +24,8 @@ public class Router{
     //Stores socket
     private static ServerSocket SERVER;
 
+    private static Socket CLIENT;
+
     //Stores router ID (CHANGE THIS IS HARDCODED!!!!!!)
     private static final int ROUTER_ID = 1;
 
@@ -34,7 +40,7 @@ public class Router{
                     + incomingConnection.getInetAddress()
                     + " on port "
                     + incomingConnection.getLocalPort());
-            RouterThreadHandler rht = new RouterThreadHandler(incomingConnection, r);
+            RouterHandlerThread rht = new RouterHandlerThread(incomingConnection, r);
             rht.start();
         }
     }
@@ -74,7 +80,7 @@ public class Router{
      * Thread for handling router processes for
      * forwarding a packet to a different link.
      */
-    private static class RouterThreadHandler extends Thread
+    private static class RouterHandlerThread extends Thread
     {
         private Socket connection;
         private Router router;
@@ -82,7 +88,7 @@ public class Router{
         private PrintWriter out;
         //Used for sending the packet byte[], can't use Scanner for byte[] :(
         private DataInputStream dis;
-        RouterThreadHandler(Socket c, Router r) throws IOException
+        RouterHandlerThread(Socket c, Router r) throws IOException
         {
             this.router = r;
             this.connection = c;
@@ -110,7 +116,20 @@ public class Router{
                 //Get routing table, look up what link to send packet to.
                 Hashtable<Byte, String> routingTable = router.getRoutingTable();
                 String destination = routingTable.get(packet[1]);
-                System.out.println("Forwarding to " + destination);
+
+                try {
+					Socket targetRouter = new Socket(destination, 9000);
+					DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
+					dos.write(packet);
+					dos.flush();
+	                System.out.println("Forwarding to " + destination);
+	                targetRouter.close();
+	                dos.close();
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
             }
         }
     }
