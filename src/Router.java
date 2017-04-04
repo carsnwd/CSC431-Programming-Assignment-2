@@ -7,15 +7,34 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
+import java.util.Scanner;
 
-public class Router {
+public class Router{
     private Hashtable<Character, String> routingTable;
 
-    public ServerSocket server;
+    private static ServerSocket SERVER;
 
-    private final int ROUTER_ID = 1;
+    private static final int ROUTER_ID = 1;
 
-    public Router(){
+    public static void main(String args[]) throws IOException
+    {
+        Router r = new Router();
+        System.out.println("Waiting for connection....");
+        while(true)
+        {
+            Socket incomingConnection = SERVER.accept();
+            System.out.println("Connection recieved from "
+                    + incomingConnection.getInetAddress()
+                    + " on port "
+                    + incomingConnection.getLocalPort());
+            System.out.println("Here");
+            RouterThreadHandler rht = new RouterThreadHandler(incomingConnection, r);
+            rht.start();
+        }
+    }
+
+    public Router()
+    {
         RoutingTableFactory rtf = new RoutingTableFactory();
         try{
             routingTable = rtf.getRoutingTable(ROUTER_ID);
@@ -23,109 +42,44 @@ public class Router {
             e.printStackTrace();
         }
         try {
-            server = new ServerSocket(9000);
+            SERVER = new ServerSocket(9000);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void acceptConnection(){
-        while(true){
-            Socket incoming;
-            try {
-                incoming = server.accept();
-                RouterHelperThread rht = new RouterHelperThread(incoming, routingTable);
-                rht.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public Hashtable<Character, String> getRoutingTable()
+    {
+        return this.routingTable;
     }
 
-    public String getRoute(Character dest){
-        return routingTable.get(dest);
-    }
-
-    /**
-     * Handles incoming connections, and reroutes them as needed
-     * @author cw3788
-     *
-     */
-    public class RouterHelperThread extends Thread{
-
-        public Socket source; //This is the socket that the message came from
-        public String message; //This is the message that was sent through the socket
-        private Hashtable<Character, String> routingTable; //This contains all the routes to all the clients
-
-        /**
-         * This is the constructor for RouterHelperThread
-         * @param source
-         * @param tendies
-         */
-        public RouterHelperThread(Socket source, Hashtable<Character, String> tendies){
-            this.source = source;
-            this.routingTable = tendies;
+    private static class RouterThreadHandler extends Thread
+    {
+        private Socket connection;
+        private Router router;
+        private Scanner in;
+        private PrintWriter out;
+        RouterThreadHandler(Socket c, Router r) throws IOException
+        {
+            this.router = r;
+            this.connection = c;
+            in = new Scanner(c.getInputStream());
+            out = new PrintWriter(c.getOutputStream());
         }
 
-        /**
-         * This routes the message to the appropriate router or client, by doing a lookup on the
-         * hashtable and then creating a socket and sending the message to the appropriate location
-         * @param dest
-         */
-        public void route(Character dest){
-            try {
-                Socket target = new Socket(routingTable.get(dest), 9000);
-                PrintWriter pw = new PrintWriter(new OutputStreamWriter(target.getOutputStream()));
-                pw.write(message);
-                pw.flush();
-
-
-
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * This picks out the individual sections of the message and verifies that the message is clean
-         */
-        public void translateMessage(){
-            Character src = message.charAt(0);
-            Character dest = message.charAt(1);
-            Character checksum = message.charAt(2);
-            Character data1 = message.charAt(3);
-            Character data2 = message.charAt(4);
-
-
-            int sum = src + dest + checksum + data1 + data2;
-
-            String sumInBinary = Integer.toBinaryString(sum);
-            boolean passedChecksum;
-
-            if(sumInBinary.equals("11111111")){
-                passedChecksum = true;
-            }else{
-                passedChecksum = false;
-            }
-
-
-            //verify with checksum
-            if(passedChecksum){
-                route(dest);
-            }
-
-        }
-
-        @Override
-        public void run(){
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(source.getInputStream()));
-                message = br.readLine();
-
-            } catch (IOException e) {
-                e.printStackTrace();
+        public void run()
+        {
+            out.println("R: Connected to router " + ROUTER_ID + " at " + SERVER.getLocalPort());
+            out.flush();
+            while(connection.isConnected())
+            {
+                System.out.println("Waiting for packet...");
+                String stringPacket = in.next();
+                byte[] packet = stringPacket.getBytes();
+                System.out.println("Packet recieved! Routing now...");
+                Hashtable<Character, String> routingTable = router.getRoutingTable();
+                String destination = routingTable.get(packet[1]);
+                System.out.println("Forwarding to " + destination);
             }
         }
     }

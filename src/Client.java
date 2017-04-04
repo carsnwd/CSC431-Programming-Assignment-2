@@ -16,7 +16,7 @@ import java.util.zip.Checksum;
  */
 public class Client
 {
-    private static final int PORT = 4446;
+    private static final int PORT = 9000;
 
     private static final String HOST = "localhost";
 
@@ -119,9 +119,9 @@ public class Client
     private byte randomDestination()
     {
         List<String> destinations = Arrays.asList("A","B","C","D");
-        destinations.remove(CLIENT_ID); //Do not send it to itself...
+        destinations.remove(CLIENT_ID + ""); //Do not send it to itself...
         rand = new Random();
-        return Byte.valueOf(destinations.get(rand.nextInt(destinations.size()))); //converts string to byte
+        return (byte)(destinations.get(rand.nextInt(destinations.size()))).charAt(0); //converts string to byte
     }
 
     /**
