@@ -1,19 +1,26 @@
-import java.io.BufferedReader;
+import javax.xml.crypto.Data;
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.Scanner;
 
+/**
+ * Router class routes messages
+ * around to different routers/clients
+ *
+ * @Author Abe and Carson
+ */
 public class Router{
-    private Hashtable<Character, String> routingTable;
+    //Stores routing table
+    private Hashtable<Byte, String> routingTable;
 
+    //Stores socket
     private static ServerSocket SERVER;
 
+    //Stores router ID (CHANGE THIS IS HARDCODED!!!!!!)
     private static final int ROUTER_ID = 1;
 
     public static void main(String args[]) throws IOException
@@ -27,14 +34,19 @@ public class Router{
                     + incomingConnection.getInetAddress()
                     + " on port "
                     + incomingConnection.getLocalPort());
-            System.out.println("Here");
             RouterThreadHandler rht = new RouterThreadHandler(incomingConnection, r);
             rht.start();
         }
     }
 
+    /**
+     * Creates a router object
+     * with a server socket that opens to listen for packets
+     * and a routing table
+     */
     public Router()
     {
+        //Creates routing tables HashTable<Byte, String> for router to use based on its ID
         RoutingTableFactory rtf = new RoutingTableFactory();
         try{
             routingTable = rtf.getRoutingTable(ROUTER_ID);
@@ -48,23 +60,35 @@ public class Router{
         }
     }
 
-    public Hashtable<Character, String> getRoutingTable()
+    /**
+     * Getter for the routers
+     * Routing Table
+     * @return
+     */
+    public Hashtable<Byte, String> getRoutingTable()
     {
         return this.routingTable;
     }
 
+    /**
+     * Thread for handling router processes for
+     * forwarding a packet to a different link.
+     */
     private static class RouterThreadHandler extends Thread
     {
         private Socket connection;
         private Router router;
         private Scanner in;
         private PrintWriter out;
+        //Used for sending the packet byte[], can't use Scanner for byte[] :(
+        private DataInputStream dis;
         RouterThreadHandler(Socket c, Router r) throws IOException
         {
             this.router = r;
             this.connection = c;
             in = new Scanner(c.getInputStream());
             out = new PrintWriter(c.getOutputStream());
+            dis = new DataInputStream(c.getInputStream());
         }
 
         public void run()
@@ -73,11 +97,18 @@ public class Router{
             out.flush();
             while(connection.isConnected())
             {
+                byte[] packet = new byte[5];
                 System.out.println("Waiting for packet...");
-                String stringPacket = in.next();
-                byte[] packet = stringPacket.getBytes();
-                System.out.println("Packet recieved! Routing now...");
-                Hashtable<Character, String> routingTable = router.getRoutingTable();
+                //Reads packet byte[] from the client, stores in packet.
+                try{
+                    dis.readFully(packet);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                //Print out each byte of packet.
+                System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[5]);
+                //Get routing table, look up what link to send packet to.
+                Hashtable<Byte, String> routingTable = router.getRoutingTable();
                 String destination = routingTable.get(packet[1]);
                 System.out.println("Forwarding to " + destination);
             }

@@ -1,3 +1,4 @@
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -11,7 +12,7 @@ import java.util.zip.Checksum;
  * Client side for our client
  * server project. Sends a request
  * with a string to reverse.
- * @author Carson Wood
+ * @author Abe and Carson
  *
  */
 public class Client
@@ -20,7 +21,7 @@ public class Client
 
     private static final String HOST = "localhost";
 
-    private static final byte CLIENT_ID = 'A';
+    private static final byte CLIENT_ID = (byte)11;
 
     private Random rand;
 
@@ -35,6 +36,9 @@ public class Client
 
     //Input from user
     private Scanner in;
+
+    //Data Output Stream
+    private DataOutputStream dos;
 
     /**
      * Creates a new instance of the client
@@ -68,6 +72,8 @@ public class Client
         out = new PrintWriter(connection.getOutputStream());
         System.out.println("Getting input stream...");
         conIn = new Scanner(connection.getInputStream());
+        System.out.println();
+        dos = new DataOutputStream(connection.getOutputStream());
         msg = conIn.nextLine();
         System.out.println(msg);
         in = new Scanner(System.in);
@@ -84,12 +90,13 @@ public class Client
      */
     private void generateAndSendPackets(Socket connection) throws InterruptedException, IOException
     {
-        byte packet[] = new byte[4];
+        byte packet[] = new byte[5];
         for (byte messageNumber = 0; messageNumber <= 20; messageNumber++)
         {
             packet[0] = CLIENT_ID; //SOURCE
             packet[1] = randomDestination(); //DESTINATION
             packet[3] = messageNumber; //DATA
+            packet[4] = messageNumber;
             //Need more data?
             packet[2] = computeCheckSum(packet); //COMPUTE CHECKSUM
             send(packet); //SEND PACKET
@@ -118,10 +125,10 @@ public class Client
      */
     private byte randomDestination()
     {
-        List<String> destinations = Arrays.asList("A","B","C","D");
-        destinations.remove(CLIENT_ID + ""); //Do not send it to itself...
+        List<Byte> destinations = Arrays.asList((byte)22,(byte)33,(byte)44);
+        //destinations.remove(CLIENT_ID); //Do not send it to itself...
         rand = new Random();
-        return (byte)(destinations.get(rand.nextInt(destinations.size()))).charAt(0); //converts string to byte
+        return destinations.get(rand.nextInt(destinations.size())); //converts string to byte
     }
 
     /**
@@ -154,13 +161,11 @@ public class Client
      * with the string to reverse.
      * @param packet
      */
-    private void send(byte[] packet)
+    private void send(byte[] packet) throws IOException
     {
         System.out.println("You sent " + packet + ", sending message...");
-        out.println(packet);
-        out.flush();
-        String msg = conIn.nextLine();
-        System.out.println(msg);
-        out.flush();
+        System.out.println(packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + " " + packet[4]);
+        dos.write(packet, 0, packet.length);
+        dos.flush();
     }
 }

@@ -15,32 +15,32 @@ public class RoutingTableFactory {
      * @return
      * @throws InvalidRouterIDException
      */
-    public Hashtable<Character, String> getRoutingTable(int router) throws InvalidRouterIDException
+    public Hashtable<Byte, String> getRoutingTable(int router) throws InvalidRouterIDException
     {
-        Hashtable<Character, String> routingTable = new Hashtable<Character, String>();
+        Hashtable<Byte, String> routingTable = new Hashtable<>();
         if(router == 1){
-            routingTable.put('A',"LA");
-            routingTable.put('B', "L12");
-            routingTable.put('C', "L12");
-            routingTable.put('D', "L14");
+            routingTable.put((byte)11,"LA");
+            routingTable.put((byte)22, "L12");
+            routingTable.put((byte)33, "L12");
+            routingTable.put((byte)44, "L14");
             return routingTable;
         }else if(router == 2){
-            routingTable.put('A',"L12");
-            routingTable.put('B', "LB");
-            routingTable.put('C', "L23");
-            routingTable.put('D', "L23");
+            routingTable.put((byte)11,"L12");
+            routingTable.put((byte)22, "LB");
+            routingTable.put((byte)33, "L23");
+            routingTable.put((byte)44, "L23");
             return routingTable;
         }else if(router == 3){
-            routingTable.put('A',"L34");
-            routingTable.put('B', "L23");
-            routingTable.put('C', "LC");
-            routingTable.put('D', "L34");
+            routingTable.put((byte)11,"L34");
+            routingTable.put((byte)22, "L23");
+            routingTable.put((byte)33, "LC");
+            routingTable.put((byte)44, "L34");
             return routingTable;
         }else if(router == 4){
-            routingTable.put('A',"L14");
-            routingTable.put('B', "L14");
-            routingTable.put('C', "L34");
-            routingTable.put('D', "LD");
+            routingTable.put((byte)11,"L14");
+            routingTable.put((byte)22, "L14");
+            routingTable.put((byte)33, "L34");
+            routingTable.put((byte)44, "LD");
             return routingTable;
         }else{
             throw new InvalidRouterIDException(router);
