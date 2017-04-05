@@ -1,5 +1,3 @@
-package runner;
-
 import javax.xml.crypto.Data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,6 +8,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.Scanner;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * Router class routes messages
@@ -100,21 +100,28 @@ public class Router{
         /**
          * Given a packet, it computes the checksum for
          * the packet with internal Checksum library
-         * @param packet
+         * @param p
          * @return
          */
-        private boolean checkCheckSum(byte[] packet)
+        private boolean checkCheckSum(byte[] p)
         {
-            byte[] tempPacket = new byte[3];
+            byte[] packet = p;
+            byte[] tempPacket = new byte[5];
             tempPacket[0] = packet[0];
             tempPacket[1] = packet[1];
-            tempPacket[2] = packet[3];
-            tempPacket[3] = packet[4];
+            tempPacket[3] = packet[3];
+            tempPacket[4] = packet[4];
             Checksum checkSum = new CRC32();
             checkSum.update(tempPacket, 0, tempPacket.length);
+            byte cc = (byte)checkSum.getValue();
+            System.out.println(packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + " " + packet[4]);
+            tempPacket[2] = (byte)checkSum.getValue();
+            System.out.println(tempPacket[0] + " " + tempPacket[1] + " " + tempPacket[2] + " " + tempPacket[3] + " " + tempPacket[4]);
             if((byte)checkSum.getValue() == packet[2]){
+                System.out.println(packet[2] + "," + cc);
                 return true;
             }else{
+                System.out.println(packet[2] + "," + cc);
                 return false;
             }
         }
@@ -134,25 +141,26 @@ public class Router{
                     e.printStackTrace();
                 }
                 //Print out each byte of packet.
-                System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[5]);
+                System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[4]);
                 //Get routing table, look up what link to send packet to.
                 Hashtable<Byte, String> routingTable = router.getRoutingTable();
                 if(checkCheckSum(packet)){
-                    String destination = routingTable.get(packet[1]);
-
-                    try {
-                        Socket targetRouter = new Socket(destination, 9000);
-                        DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
-                        dos.write(packet);
-                        dos.flush();
-                        System.out.println("Forwarding to " + destination);
-                        targetRouter.close();
-                        dos.close();
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+//                    String destination = routingTable.get(packet[1]);
+//
+//                    try {
+//                        Socket targetRouter = new Socket(destination, 9000);
+//                        DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
+//                        dos.write(packet);
+//                        dos.flush();
+//                        System.out.println("Forwarding to " + destination);
+//                        targetRouter.close();
+//                        dos.close();
+//                    } catch (UnknownHostException e) {
+//                        e.printStackTrace();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+                    System.out.println("Looks good! FORWARD THAT PACKET BOOOOOOOI");
                 }else{
                     System.out.println("Checksum invalid!!!!");
                 }

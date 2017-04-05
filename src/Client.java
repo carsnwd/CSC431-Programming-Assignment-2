@@ -1,4 +1,3 @@
-package runner;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -96,9 +95,9 @@ public class Client
         {
             packet[0] = CLIENT_ID; //SOURCE
             packet[1] = randomDestination(); //DESTINATION
+            packet[2] = (byte) 0;
             packet[3] = messageNumber; //DATA
             packet[4] = messageNumber;
-            //Need more data?
             packet[2] = computeCheckSum(packet); //COMPUTE CHECKSUM
             send(packet); //SEND PACKET
             Thread.sleep(4000); //WAIT TO SEND NEXT PACKET
