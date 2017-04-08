@@ -1,5 +1,9 @@
+package runner;
+
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,7 +21,7 @@ import java.util.zip.Checksum;
  */
 public class Client
 {
-    private static final int PORT = 9000;
+    private static final int PORT = 8999;
 
     private static final String HOST = "localhost";
 
@@ -26,7 +30,7 @@ public class Client
     private Random rand;
 
     //For reciving packets
-    private ServerSocket clientRecieverSocket = null;
+    public ServerSocket clientRecieverSocket;
 
     //Output to server
     private PrintWriter out;
@@ -53,6 +57,17 @@ public class Client
         c.run();
     }
 
+    public Client(){
+    	try {
+			clientRecieverSocket = new ServerSocket(PORT);
+			ClientHelperThread cht = new ClientHelperThread(this);
+			cht.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+
     /**
      * Runs the client
      *
@@ -66,7 +81,6 @@ public class Client
 
         //Opens connection
         Socket connection = openConnection();
-
         //Gets I/O streams from server
         System.out.println("Getting output stream...");
         out = new PrintWriter(connection.getOutputStream());
@@ -168,4 +182,29 @@ public class Client
         dos.write(packet, 0, packet.length);
         dos.flush();
     }
+
+
+    public class ClientHelperThread extends Thread{
+
+    	private Client target;
+
+    	public ClientHelperThread(Client client){
+    		this.target = client;
+    	}
+
+    	@Override
+    	public void run(){
+    		while(true){
+        		try {
+					Socket socket = target.clientRecieverSocket.accept();
+					BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					String msg = br.readLine();
+					System.out.println(msg);
+        		} catch (IOException e) {
+					e.printStackTrace();
+				}
+    		}
+    	}
+    }
+
 }

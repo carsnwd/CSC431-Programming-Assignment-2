@@ -1,3 +1,5 @@
+package runner;
+
 import javax.xml.crypto.Data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,6 +20,10 @@ import java.util.zip.Checksum;
  * @Author Abe and Carson
  */
 public class Router{
+
+	private final String IP_ADDR = "157.160.36.11";
+	private final int PORT = 9000;
+
     //Stores routing table
     private Hashtable<Byte, String> routingTable;
 
@@ -145,21 +151,20 @@ public class Router{
                 //Get routing table, look up what link to send packet to.
                 Hashtable<Byte, String> routingTable = router.getRoutingTable();
                 if(checkCheckSum(packet)){
-//                    String destination = routingTable.get(packet[1]);
-//
-//                    try {
-//                        Socket targetRouter = new Socket(destination, 9000);
-//                        DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
-//                        dos.write(packet);
-//                        dos.flush();
-//                        System.out.println("Forwarding to " + destination);
-//                        targetRouter.close();
-//                        dos.close();
-//                    } catch (UnknownHostException e) {
-//                        e.printStackTrace();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                    String destination = routingTable.get(packet[1]);
+                    try {
+                        Socket targetRouter = new Socket(destination, 9000);
+                        DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
+                        dos.write(packet);
+                        dos.flush();
+                        System.out.println("Forwarding to " + destination);
+                        targetRouter.close();
+                        dos.close();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("Looks good! FORWARD THAT PACKET BOOOOOOOI");
                 }else{
                     System.out.println("Checksum invalid!!!!");
