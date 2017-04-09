@@ -1,5 +1,7 @@
 //package runner;
 
+import util.Constants;
+
 import javax.xml.crypto.Data;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -20,21 +22,25 @@ import java.util.zip.Checksum;
  * @Author Abe and Carson
  */
 public class Router{
-
-	private final String IP_ADDR = "157.160.13.168";
-	private final int PORT = 9463;
-
+    //Stores the IP address for router
+	private static final String IP_ADDR = Constants.IP_ROUTER2;
+	//Stores port number for routers to listen on for packets
+	private static final int PORT = Constants.PORT;
+	//Stores port number for router to forward to clients that they are listening on
+	private static final int CLIENT_LISTENER_PORT = Constants.CLIENT_LISTENER_PORT;
     //Stores routing table
     private Hashtable<Byte, String> routingTable;
-
     //Stores socket
     private static ServerSocket SERVER;
-
-    private static Socket CLIENT;
-
     //Stores router ID (CHANGE THIS IS HARDCODED!!!!!!)
-    private static final int ROUTER_ID = 1;
+    private static final int ROUTER_ID = 2;
 
+    /**
+     * Creates a new router, opens a socket, and waits
+     * for a connection.
+     * @param args
+     * @throws IOException
+     */
     public static void main(String args[]) throws IOException
     {
         Router r = new Router();
@@ -66,7 +72,7 @@ public class Router{
             e.printStackTrace();
         }
         try {
-            SERVER = new ServerSocket(9463);
+            SERVER = new ServerSocket(PORT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,6 +110,34 @@ public class Router{
         }
 
         /**
+         * Starts thread to listen for packets
+         * to forward
+         */
+        public void run()
+        {
+            try {
+                out.println("R: Connected to router " + ROUTER_ID + " at " + SERVER.getLocalPort());
+                out.flush();
+                while (connection.isConnected()) {
+                    byte[] packet = new byte[5];
+                    System.out.println("Waiting for packet...");
+                    //Reads packet byte[] from the client, stores in packet.
+                    dis.readFully(packet);
+                    //Print out each byte of packet.
+                    System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[4]);
+                    Thread.sleep(4000);
+                    //Checks if checksum is valid then forwards packet
+                    Hashtable<Byte, String> routingTable = router.getRoutingTable();
+                    if (checkCheckSum(packet)) {
+                        forwardPacket(packet, routingTable);
+                    } else {
+                        System.out.println("Checksum invalid!!!!");
+                    }
+                }
+            }catch(Exception e){/**Do Nothing**/}
+        }
+
+        /**
          * Given a packet, it computes the checksum for
          * the packet with internal Checksum library
          * @param p
@@ -132,35 +166,14 @@ public class Router{
             }
         }
 
-        public void run()
-        {
-            try {
-                out.println("R: Connected to router " + ROUTER_ID + " at " + SERVER.getLocalPort());
-                out.flush();
-                while (connection.isConnected()) {
-                    byte[] packet = new byte[5];
-                    System.out.println("Waiting for packet...");
-                    //Reads packet byte[] from the client, stores in packet.
-                    dis.readFully(packet);
-                    //Print out each byte of packet.
-                    System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[4]);
-                    Thread.sleep(4000);
-                    //Get routing table, look up what link to send packet to.
-                    Hashtable<Byte, String> routingTable = router.getRoutingTable();
-                    if (checkCheckSum(packet)) {
-                        forwardPacket(packet, routingTable);
-                    } else {
-                        System.out.println("Checksum invalid!!!!");
-                    }
-                }
-            }catch(Exception e){
-//                e.printStackTrace();
-            }
-        }
-
         private void forwardPacket(byte[] packet, Hashtable<Byte, String> routingTable) throws IOException {
             String destination = routingTable.get(packet[1]);
-            Socket targetRouter = new Socket(destination, 9463);
+            Socket targetRouter;
+            if(destination == IP_ADDR){
+                targetRouter = new Socket(destination,CLIENT_LISTENER_PORT);
+            }else {
+                targetRouter = new Socket(destination,PORT);
+            }
             DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
             dos.write(packet);
             dos.flush();
