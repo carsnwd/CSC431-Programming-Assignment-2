@@ -167,6 +167,15 @@ public class Router
             }
         }
 
+        /**
+         * Forwards the packet, if IP = Routers IP
+         * then it forwards it to the port the client
+         * connected to the router is listening on. Otherwise
+         * it just sends it to a router.
+         * @param packet
+         * @param routingTable
+         * @throws IOException
+         */
         private void forwardPacket(byte[] packet, Hashtable<Byte, String> routingTable) throws IOException {
             String destination = routingTable.get(packet[1]);
             Socket targetRouter;
