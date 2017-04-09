@@ -23,7 +23,7 @@ public class Client
 {
     private static final int PORT = 9463;
 
-    private static final String HOST = "192.168.76.1";
+    private static final String HOST = "157.160.13.168";
 
     private static final byte CLIENT_ID = (byte)11;
 
