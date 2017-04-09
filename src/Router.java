@@ -21,7 +21,8 @@ import java.util.zip.Checksum;
  *
  * @Author Abe and Carson
  */
-public class Router{
+public class Router
+{
     //Stores the IP address for router
 	private static final String IP_ADDR = Constants.IP_ROUTER2;
 	//Stores port number for routers to listen on for packets
