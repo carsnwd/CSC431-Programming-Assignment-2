@@ -1,5 +1,7 @@
 //package runner;
 
+import util.Constants;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,11 +23,11 @@ import java.util.zip.Checksum;
  */
 public class Client
 {
-    private static final int PORT = 9463;
+    private static final int PORT = Constants.PORT;
 
-    private static final String HOST = "157.160.13.168";
+    private static final String HOST = Constants.IP_ROUTER1;
 
-    private static final byte CLIENT_ID = (byte)11;
+    private static final byte CLIENT_ID = Constants.CLIENT_ID_A;
 
     private Random rand;
 
@@ -59,7 +61,7 @@ public class Client
 
     public Client(){
     	try {
-			clientRecieverSocket = new ServerSocket(PORT);
+			clientRecieverSocket = new ServerSocket(Constants.CLIENT_LISTENER_PORT);
 			ClientHelperThread cht = new ClientHelperThread(this);
 			cht.start();
 		} catch (IOException e) {
@@ -139,7 +141,7 @@ public class Client
      */
     private byte randomDestination()
     {
-        List<Byte> destinations = Arrays.asList((byte)22/**,(byte)33,(byte)44**/);
+        List<Byte> destinations = Arrays.asList((byte)11/**,(byte)33,(byte)44**/);
         //destinations.remove(CLIENT_ID); //Do not send it to itself...
         rand = new Random();
         return destinations.get(rand.nextInt(destinations.size())); //converts string to byte
