@@ -1,3 +1,5 @@
+import util.Constants;
+
 import java.util.Hashtable;
 
 /**
@@ -15,32 +17,42 @@ public class RoutingTableFactory {
      * @return
      * @throws InvalidRouterIDException
      */
+
+    private static final byte CLIENT_ID_A = Constants.CLIENT_ID_A;
+    private static final byte CLIENT_ID_B = Constants.CLIENT_ID_B;
+    private static final byte CLIENT_ID_C = Constants.CLIENT_ID_C;
+    private static final byte CLIENT_ID_D = Constants.CLIENT_ID_D;
+    private static final String IP_ROUTER1 = Constants.IP_ROUTER1;
+    private static final String IP_ROUTER2 = Constants.IP_ROUTER2;
+    private static final String IP_ROUTER3 = Constants.IP_ROUTER3;
+    private static final String IP_ROUTER4 = Constants.IP_ROUTER4;
+
     public Hashtable<Byte, String> getRoutingTable(int router) throws InvalidRouterIDException
     {
         Hashtable<Byte, String> routingTable = new Hashtable<>();
         if(router == 1){
-            routingTable.put((byte)11,"157.160.13.168");
-            routingTable.put((byte)22, "157.160.70.20");
-            routingTable.put((byte)33, "L12");
-            routingTable.put((byte)44, "L14");
+            routingTable.put(CLIENT_ID_A,IP_ROUTER1);
+            routingTable.put(CLIENT_ID_B, IP_ROUTER2);
+            routingTable.put(CLIENT_ID_C, IP_ROUTER2);
+            routingTable.put(CLIENT_ID_D, IP_ROUTER4);
             return routingTable;
         }else if(router == 2){
-            routingTable.put((byte)11,"157.160.143.220");
-            routingTable.put((byte)22, "157.160.70.20");
-            routingTable.put((byte)33, "L23");
-            routingTable.put((byte)44, "L23");
+            routingTable.put(CLIENT_ID_A,IP_ROUTER1);
+            routingTable.put(CLIENT_ID_B, IP_ROUTER2);
+            routingTable.put(CLIENT_ID_C, IP_ROUTER3);
+            routingTable.put(CLIENT_ID_D, IP_ROUTER3);
             return routingTable;
         }else if(router == 3){
-            routingTable.put((byte)11,"L34");
-            routingTable.put((byte)22, "L23");
-            routingTable.put((byte)33, "LC");
-            routingTable.put((byte)44, "L34");
+            routingTable.put(CLIENT_ID_A,IP_ROUTER4);
+            routingTable.put(CLIENT_ID_B, IP_ROUTER2);
+            routingTable.put(CLIENT_ID_C, IP_ROUTER3);
+            routingTable.put(CLIENT_ID_D, IP_ROUTER4);
             return routingTable;
         }else if(router == 4){
-            routingTable.put((byte)11,"L14");
-            routingTable.put((byte)22, "L14");
-            routingTable.put((byte)33, "L34");
-            routingTable.put((byte)44, "LD");
+            routingTable.put(CLIENT_ID_A,IP_ROUTER1);
+            routingTable.put(CLIENT_ID_B, IP_ROUTER1);
+            routingTable.put(CLIENT_ID_C, IP_ROUTER3);
+            routingTable.put(CLIENT_ID_D, IP_ROUTER4);
             return routingTable;
         }else{
             throw new InvalidRouterIDException(router);
