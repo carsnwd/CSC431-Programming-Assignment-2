@@ -1,4 +1,4 @@
-package runner;
+//package runner;
 
 import javax.xml.crypto.Data;
 import java.io.DataInputStream;
@@ -21,8 +21,8 @@ import java.util.zip.Checksum;
  */
 public class Router{
 
-	private final String IP_ADDR = "157.160.36.11";
-	private final int PORT = 9000;
+	private final String IP_ADDR = "157.160.13.168";
+	private final int PORT = 9463;
 
     //Stores routing table
     private Hashtable<Byte, String> routingTable;
@@ -66,7 +66,7 @@ public class Router{
             e.printStackTrace();
         }
         try {
-            SERVER = new ServerSocket(9000);
+            SERVER = new ServerSocket(9463);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -134,42 +134,39 @@ public class Router{
 
         public void run()
         {
-            out.println("R: Connected to router " + ROUTER_ID + " at " + SERVER.getLocalPort());
-            out.flush();
-            while(connection.isConnected())
-            {
-                byte[] packet = new byte[5];
-                System.out.println("Waiting for packet...");
-                //Reads packet byte[] from the client, stores in packet.
-                try{
+            try {
+                out.println("R: Connected to router " + ROUTER_ID + " at " + SERVER.getLocalPort());
+                out.flush();
+                while (connection.isConnected()) {
+                    byte[] packet = new byte[5];
+                    System.out.println("Waiting for packet...");
+                    //Reads packet byte[] from the client, stores in packet.
                     dis.readFully(packet);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                //Print out each byte of packet.
-                System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[4]);
-                //Get routing table, look up what link to send packet to.
-                Hashtable<Byte, String> routingTable = router.getRoutingTable();
-                if(checkCheckSum(packet)){
-                    String destination = routingTable.get(packet[1]);
-                    try {
-                        Socket targetRouter = new Socket(destination, 9000);
-                        DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
-                        dos.write(packet);
-                        dos.flush();
-                        System.out.println("Forwarding to " + destination);
-                        targetRouter.close();
-                        dos.close();
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    //Print out each byte of packet.
+                    System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[4]);
+                    Thread.sleep(4000);
+                    //Get routing table, look up what link to send packet to.
+                    Hashtable<Byte, String> routingTable = router.getRoutingTable();
+                    if (checkCheckSum(packet)) {
+                        forwardPacket(packet, routingTable);
+                    } else {
+                        System.out.println("Checksum invalid!!!!");
                     }
-                    System.out.println("Looks good! FORWARD THAT PACKET BOOOOOOOI");
-                }else{
-                    System.out.println("Checksum invalid!!!!");
                 }
+            }catch(Exception e){
+                e.printStackTrace();
             }
+        }
+
+        private void forwardPacket(byte[] packet, Hashtable<Byte, String> routingTable) throws IOException {
+            String destination = routingTable.get(packet[1]);
+            Socket targetRouter = new Socket(destination, 9463);
+            DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());
+            dos.write(packet);
+            dos.flush();
+            System.out.println("Forwarding to " + destination);
+            targetRouter.close();
+            dos.close();
         }
     }
 }

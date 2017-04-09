@@ -19,14 +19,14 @@ public class RoutingTableFactory {
     {
         Hashtable<Byte, String> routingTable = new Hashtable<>();
         if(router == 1){
-            routingTable.put((byte)11,"LA");
-            routingTable.put((byte)22, "L12");
+            routingTable.put((byte)11,"157.160.13.168");
+            routingTable.put((byte)22, "157.160.70.20");
             routingTable.put((byte)33, "L12");
             routingTable.put((byte)44, "L14");
             return routingTable;
         }else if(router == 2){
-            routingTable.put((byte)11,"L12");
-            routingTable.put((byte)22, "LB");
+            routingTable.put((byte)11,"157.160.143.220");
+            routingTable.put((byte)22, "157.160.70.20");
             routingTable.put((byte)33, "L23");
             routingTable.put((byte)44, "L23");
             return routingTable;

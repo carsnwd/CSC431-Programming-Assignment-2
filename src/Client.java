@@ -1,4 +1,4 @@
-package runner;
+//package runner;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -21,9 +21,9 @@ import java.util.zip.Checksum;
  */
 public class Client
 {
-    private static final int PORT = 8999;
+    private static final int PORT = 9463;
 
-    private static final String HOST = "localhost";
+    private static final String HOST = "192.168.76.1";
 
     private static final byte CLIENT_ID = (byte)11;
 
@@ -139,7 +139,7 @@ public class Client
      */
     private byte randomDestination()
     {
-        List<Byte> destinations = Arrays.asList((byte)22,(byte)33,(byte)44);
+        List<Byte> destinations = Arrays.asList((byte)22/**,(byte)33,(byte)44**/);
         //destinations.remove(CLIENT_ID); //Do not send it to itself...
         rand = new Random();
         return destinations.get(rand.nextInt(destinations.size())); //converts string to byte
