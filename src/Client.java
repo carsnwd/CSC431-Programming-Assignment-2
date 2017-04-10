@@ -3,6 +3,7 @@
 import util.Constants;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -141,7 +142,7 @@ public class Client
      */
     private byte randomDestination()
     {
-        List<Byte> destinations = Arrays.asList((byte)11/**,(byte)33,(byte)44**/);
+        List<Byte> destinations = Arrays.asList((byte)22, (byte)33/*(byte)44*/);
         //destinations.remove(CLIENT_ID); //Do not send it to itself...
         rand = new Random();
         return destinations.get(rand.nextInt(destinations.size())); //converts string to byte
@@ -199,9 +200,12 @@ public class Client
     		while(true){
         		try {
 					Socket socket = target.clientRecieverSocket.accept();
-					BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					String msg = br.readLine();
-					System.out.println(msg);
+					//BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					//String msg = br.readLine();
+					byte[] packet = new byte[5];
+					DataInputStream dis = new DataInputStream(socket.getInputStream());
+					dis.readFully(packet);
+					System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[4]);
         		} catch (IOException e) {
 					e.printStackTrace();
 				}

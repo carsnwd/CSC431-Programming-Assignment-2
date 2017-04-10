@@ -24,7 +24,7 @@ import java.util.zip.Checksum;
 public class Router
 {
     //Stores the IP address for router
-	private static final String IP_ADDR = Constants.IP_ROUTER2;
+	private static final String IP_ADDR = Constants.IP_ROUTER1;
 	//Stores port number for routers to listen on for packets
 	private static final int PORT = Constants.PORT;
 	//Stores port number for router to forward to clients that they are listening on
@@ -34,7 +34,7 @@ public class Router
     //Stores socket
     private static ServerSocket SERVER;
     //Stores router ID (CHANGE THIS IS HARDCODED!!!!!!)
-    private static final int ROUTER_ID = 2;
+    private static final int ROUTER_ID = 1;
 
     /**
      * Creates a new router, opens a socket, and waits
