@@ -23,16 +23,21 @@ import java.util.zip.Checksum;
  */
 public class Router
 {
-    //Stores the IP address for router
+	//Stores the IP address for router
 	private static final String IP_ADDR = Constants.IP_ROUTER1;
+
 	//Stores port number for routers to listen on for packets
 	private static final int PORT = Constants.PORT;
+
 	//Stores port number for router to forward to clients that they are listening on
 	private static final int CLIENT_LISTENER_PORT = Constants.CLIENT_LISTENER_PORT;
-    //Stores routing table
+
+	//Stores routing table
     private Hashtable<Byte, String> routingTable;
+
     //Stores socket
     private static ServerSocket SERVER;
+
     //Stores router ID (CHANGE THIS IS HARDCODED!!!!!!)
     private static final int ROUTER_ID = 1;
 
@@ -67,14 +72,18 @@ public class Router
     {
         //Creates routing tables HashTable<Byte, String> for router to use based on its ID
         RoutingTableFactory rtf = new RoutingTableFactory();
-        try{
+        try
+        {
             routingTable = rtf.getRoutingTable(ROUTER_ID);
-        } catch(RoutingTableFactory.InvalidRouterIDException e){
+        } catch(RoutingTableFactory.InvalidRouterIDException e)
+        {
             e.printStackTrace();
         }
-        try {
+        try
+        {
             SERVER = new ServerSocket(PORT);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
@@ -116,10 +125,12 @@ public class Router
          */
         public void run()
         {
-            try {
+            try
+            {
                 out.println("R: Connected to router " + ROUTER_ID + " at " + SERVER.getLocalPort());
                 out.flush();
-                while (connection.isConnected()) {
+                while (connection.isConnected())
+                {
                     byte[] packet = new byte[5];
                     System.out.println("Waiting for packet...");
                     //Reads packet byte[] from the client, stores in packet.
@@ -129,9 +140,11 @@ public class Router
                     Thread.sleep(4000);
                     //Checks if checksum is valid then forwards packet
                     Hashtable<Byte, String> routingTable = router.getRoutingTable();
-                    if (checkCheckSum(packet)) {
+                    if (checkCheckSum(packet))
+                    {
                         forwardPacket(packet, routingTable);
-                    } else {
+                    } else
+                    {
                         System.out.println("Checksum invalid!!!!");
                     }
                 }
@@ -158,10 +171,12 @@ public class Router
             System.out.println(packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + " " + packet[4]);
             tempPacket[2] = (byte)checkSum.getValue();
             System.out.println(tempPacket[0] + " " + tempPacket[1] + " " + tempPacket[2] + " " + tempPacket[3] + " " + tempPacket[4]);
-            if((byte)checkSum.getValue() == packet[2]){
+            if((byte)checkSum.getValue() == packet[2])
+            {
                 System.out.println(packet[2] + "," + cc);
                 return true;
-            }else{
+            }else
+            {
                 System.out.println(packet[2] + "," + cc);
                 return false;
             }
@@ -176,12 +191,15 @@ public class Router
          * @param routingTable
          * @throws IOException
          */
-        private void forwardPacket(byte[] packet, Hashtable<Byte, String> routingTable) throws IOException {
+        private void forwardPacket(byte[] packet, Hashtable<Byte, String> routingTable) throws IOException
+        {
             String destination = routingTable.get(packet[1]);
             Socket targetRouter;
-            if(destination == IP_ADDR){
+            if(destination == IP_ADDR)
+            {
                 targetRouter = new Socket(destination,CLIENT_LISTENER_PORT);
-            }else {
+            }else
+            {
                 targetRouter = new Socket(destination,PORT);
             }
             DataOutputStream dos = new DataOutputStream(targetRouter.getOutputStream());

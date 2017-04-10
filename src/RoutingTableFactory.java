@@ -30,31 +30,36 @@ public class RoutingTableFactory {
     public Hashtable<Byte, String> getRoutingTable(int router) throws InvalidRouterIDException
     {
         Hashtable<Byte, String> routingTable = new Hashtable<>();
-        if(router == 1){
+        if(router == 1)
+        {
             routingTable.put(CLIENT_ID_A,IP_ROUTER1);
             routingTable.put(CLIENT_ID_B, IP_ROUTER2);
             routingTable.put(CLIENT_ID_C, IP_ROUTER2);
             routingTable.put(CLIENT_ID_D, IP_ROUTER4);
             return routingTable;
-        }else if(router == 2){
+        }else if(router == 2)
+        {
             routingTable.put(CLIENT_ID_A,IP_ROUTER1);
             routingTable.put(CLIENT_ID_B, IP_ROUTER2);
             routingTable.put(CLIENT_ID_C, IP_ROUTER3);
             routingTable.put(CLIENT_ID_D, IP_ROUTER3);
             return routingTable;
-        }else if(router == 3){
+        }else if(router == 3)
+        {
             routingTable.put(CLIENT_ID_A,IP_ROUTER4);
             routingTable.put(CLIENT_ID_B, IP_ROUTER2);
             routingTable.put(CLIENT_ID_C, IP_ROUTER3);
             routingTable.put(CLIENT_ID_D, IP_ROUTER4);
             return routingTable;
-        }else if(router == 4){
+        }else if(router == 4)
+        {
             routingTable.put(CLIENT_ID_A,IP_ROUTER1);
             routingTable.put(CLIENT_ID_B, IP_ROUTER1);
             routingTable.put(CLIENT_ID_C, IP_ROUTER3);
             routingTable.put(CLIENT_ID_D, IP_ROUTER4);
             return routingTable;
-        }else{
+        }else
+        {
             throw new InvalidRouterIDException(router);
         }
     }

@@ -24,10 +24,13 @@ import java.util.zip.Checksum;
  */
 public class Client
 {
+	//This is our port
     private static final int PORT = Constants.PORT;
 
+    //This is the router that is hosting us
     private static final String HOST = Constants.IP_ROUTER1;
 
+    //Stores port number for router to forward to clients that they are listening on
     private static final byte CLIENT_ID = Constants.CLIENT_ID_A;
 
     private Random rand;
@@ -60,12 +63,15 @@ public class Client
         c.run();
     }
 
-    public Client(){
-    	try {
+    public Client()
+    {
+    	try
+    	{
 			clientRecieverSocket = new ServerSocket(Constants.CLIENT_LISTENER_PORT);
 			ClientHelperThread cht = new ClientHelperThread(this);
 			cht.start();
-		} catch (IOException e) {
+		} catch (IOException e)
+    	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -142,7 +148,7 @@ public class Client
      */
     private byte randomDestination()
     {
-        List<Byte> destinations = Arrays.asList((byte)22, (byte)33/*(byte)44*/);
+        List<Byte> destinations = Arrays.asList((byte)22, (byte)33, (byte)44);
         //destinations.remove(CLIENT_ID); //Do not send it to itself...
         rand = new Random();
         return destinations.get(rand.nextInt(destinations.size())); //converts string to byte
@@ -187,18 +193,31 @@ public class Client
     }
 
 
-    public class ClientHelperThread extends Thread{
+    /**
+     * This is a listener that purely listens for incoming messages
+     * @author al3347
+     *
+     */
+    public class ClientHelperThread extends Thread
+    {
 
-    	private Client target;
+    	private Client target; //Target client
 
-    	public ClientHelperThread(Client client){
+    	public ClientHelperThread(Client client)
+    	{
     		this.target = client;
     	}
 
+    	/**
+    	 * Runs the thread, receives messages
+    	 */
     	@Override
-    	public void run(){
-    		while(true){
-        		try {
+    	public void run()
+    	{
+    		while(true)
+    		{
+        		try
+        		{
 					Socket socket = target.clientRecieverSocket.accept();
 					//BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					//String msg = br.readLine();
@@ -206,7 +225,8 @@ public class Client
 					DataInputStream dis = new DataInputStream(socket.getInputStream());
 					dis.readFully(packet);
 					System.out.println("Packet recieved: " + packet[0] + " " + packet[1] + " " + packet[2] + " " + packet[3] + packet[4]);
-        		} catch (IOException e) {
+        		} catch (IOException e)
+        		{
 					e.printStackTrace();
 				}
     		}
